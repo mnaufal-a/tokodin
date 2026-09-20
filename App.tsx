@@ -1,45 +1,41 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import AppNavigator from './src/navigation/AppNavigator';
+import { OverdueProvider } from './src/context/OverdueContext';
+import { registerTranslation } from 'react-native-paper-dates';
+import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+registerTranslation('id', {
+  save: 'Simpan',
+  selectSingle: 'Pilih tanggal',
+  selectMultiple: 'Pilih tanggal',
+  selectRange: 'Pilih periode',
+  notAccordingToDateFormat: (inputFormat) => `Format tanggal harus ${inputFormat}`,
+  mustBeHigherThan: (date) => `Harus setelah ${date}`,
+  mustBeLowerThan: (date) => `Harus sebelum ${date}`,
+  mustBeBetween: (startDate, endDate) => `Harus di antara ${startDate} - ${endDate}`,
+  dateIsDisabled: 'Tanggal tidak diizinkan',
+  previous: 'Sebelumnya',
+  next: 'Selanjutnya',
+  typeInDate: 'Ketik tanggal',
+  pickDateFromCalendar: 'Pilih tanggal dari kalender',
+  close: 'Tutup',
+  hour: '',
+  minute: '',
+});
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
+  
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <PaperProvider>
+        <OverdueProvider>
+          <AppNavigator />
+        </OverdueProvider>
+      </PaperProvider>
+
     </SafeAreaProvider>
-  );
+    
+  )
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
