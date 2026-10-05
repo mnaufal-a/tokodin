@@ -1,20 +1,34 @@
-import { useState, useEffect } from "react";
-import { View, Text, StyleSheet,ActivityIndicator,FlatList, TouchableOpacity } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import type { NavigationProp } from "@react-navigation/native";
+import { View, Text, StyleSheet,ActivityIndicator,FlatList, TouchableOpacity, TextInput } from "react-native";
 import { getChatHistory, ChatLog } from "../api/chatHistoryApi";
 import { colors } from "../theme/colors";
 import { layout } from "../theme/layout";
-import { formatDate } from "../utils/formatDate";
+import { formatRelativeTime } from "../utils/formatDate";
 import { filterByDatePreset, FilterPreset } from "../utils/dateFilter";
+import { Search } from "lucide-react-native";
 
-function ChatHistoryScreen() {
+function ChatHistoryScreen({ navigation }: { navigation: NavigationProp<any> }) {
     const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterPreset>('semua');
+    const [search, setSearch] = useState("");
 
-    useEffect (() => {
-        loadChatHistory()
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadChatHistory();
+        }, [])
+    )
+
+    //buat re-tab yang udah aktif
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('tabPress' as never, () => {
+            loadChatHistory();
+        });
+        return unsubscribe;
+    }, [navigation])
 
     async function loadChatHistory() {
         try {
@@ -45,7 +59,20 @@ function ChatHistoryScreen() {
         )
     }
 
-    const filteredLogs = filterByDatePreset(chatLogs, filter, (log) => log.Timestamp);
+    const matchChat = (log: ChatLog, query: string) => {
+        const searchText = query.toLocaleLowerCase();
+
+        return (
+            log.customerName?.toLowerCase().includes(searchText) ||
+
+            log.phoneNumber?.toLowerCase().includes(searchText)
+        )
+    }
+
+    const filteredLogs = filterByDatePreset(
+        chatLogs, 
+        filter, (log) => log.Timestamp)
+        .filter((log) => matchChat(log, search));
 
     const filterOptions: {value: FilterPreset; label: string} [] = [
         { value: 'hari-ini', label: 'Hari Ini'},
@@ -54,8 +81,18 @@ function ChatHistoryScreen() {
         { value: 'semua', label: 'Semua'},
     ]
 
+
     return (
         <View style={styles.container} >
+            <View style={styles.searchRow}>
+                <Search size={20}/>
+                <TextInput
+                    style={styles.search}
+                    placeholder="Cari nama, nomor HP, atau pesanan..."
+                    value={search}
+                    onChangeText={setSearch}
+                />
+            </View>
             <View style={styles.filterRow}>
                 {filterOptions.map((option) => (
                     <TouchableOpacity
@@ -85,7 +122,7 @@ function ChatHistoryScreen() {
                     <View style={styles.card} >
                         <View style={styles.cardHeader}>
                             <Text style={styles.customerName}>{item.customerName}</Text>
-                            <Text style={styles.phoneNumber}>{item.phoneNumber}</Text>
+                            <Text style={styles.phoneNumber}>+{item.phoneNumber}</Text>
                         </View>
                         <View style ={styles.messageBubbleIn}>
                             <Text style={styles.messageLabel}>Customer:</Text>
@@ -96,7 +133,7 @@ function ChatHistoryScreen() {
                             <Text style={styles.messageText}>{item.messageOut}</Text>
                         </View>
 
-                        <Text style={styles.dateText}>{formatDate(item.Timestamp)}</Text>
+                        <Text style={styles.dateText}>{formatRelativeTime(item.Timestamp)}</Text>
                     </View>
                 )}
             />
@@ -109,6 +146,20 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background,
     },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: layout.cardRadius,
+        padding: 8,
+        backgroundColor: colors.surface,
+        ...layout.cardBorder,
+        ...layout.cardShadowLight,
+        margin: 16,
+    },
+    search: {
+        fontSize: 16,
+        marginLeft: 6
+    },
     centered: {
         flex: 1,
         justifyContent: 'center',
@@ -119,7 +170,8 @@ const styles = StyleSheet.create({
         margin: 8,
         padding: 16,
         borderRadius: layout.cardRadius,
-        ...layout.cardShadow,
+        ...layout.cardBorder,
+        ...layout.cardShadowLight
     },
     cardHeader: {
         flexDirection: 'row',

@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { NavigationProp } from "@react-navigation/native";
 import { layout } from '../theme/layout'
 import { getKasHistory } from "../api/kasHistoryApi";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, } from "react-native";
 import { KasHistoryResponse } from "../api/kasHistoryApi";
 import { formatDate } from "../utils/formatDate";
 import { colors } from "../theme/colors";
+import Calendar from "lucide-react-native/icons/calendar";
 
 
-export default function LaporanScreen() {
+export default function LaporanScreen({ navigation }: { navigation: NavigationProp<any> }) {
     const [mode, setMode] = useState<'harian' | 'bulanan'>('harian');
     const [tanggal, setTanggal] = useState(new Date());
     const [data, setData] = useState<KasHistoryResponse | null>(null);
@@ -34,9 +36,8 @@ export default function LaporanScreen() {
         }
     }
 
-    useEffect(() => {
-        async function fechData() {
-            setIsLoading(true);
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
             try {
                 if (mode === 'harian') {
                     const tanggalString = tanggal.toISOString().split('T')[0];
@@ -53,10 +54,18 @@ export default function LaporanScreen() {
             } finally {
                 setIsLoading(false);
             }
-        }
+    }, [mode, tanggal])
 
-        fechData();
-    }, [mode, tanggal]);
+    useEffect(() => {
+        fetchData();
+    }, [fetchData])
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('tabPress' as never, () => {
+            fetchData()
+        })
+        return unsubscribe;
+    }, [navigation,fetchData])
 
     function getDaftarTanggal() {
         const tahun = tanggal.getFullYear();
@@ -71,11 +80,15 @@ export default function LaporanScreen() {
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
 
+    const transaksiMasuk = data?.riwayat.filter((item) => item.tipe === 'Masuk').length
+    const transaksiKeluar = data?.riwayat.filter((item) => item.tipe === 'Keluar').length
+
     return (
         <>
             <ScrollView style={styles.container}>
                 
                 <Text style={styles.title}>Laporan Warung Anda</Text>
+                <Text style={styles.subTitle}>Ringkasan Pembukuan TokoDin</Text>
 
                 <View 
                     style={styles.toggleContainer}
@@ -102,12 +115,15 @@ export default function LaporanScreen() {
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() =>  setShowDatePicker(true) }>
-                        <Text style={styles.dateNavText}>
-                            {mode === 'harian'
-                                ? tanggal.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-                                : tanggal.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
-                            }
-                        </Text>
+                        <View style={styles.dateNavTextRow}>
+                            <Calendar color={colors.primary} size={22}/>
+                            <Text style={styles.dateNavText}>
+                                {mode === 'harian'
+                                    ? tanggal.toLocaleDateString('id-ID', { day: 'numeric', weekday: 'long', month: 'short', year: 'numeric' })
+                                    : tanggal.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+                                }
+                            </Text>
+                        </View>
 
                     </TouchableOpacity>
 
@@ -120,29 +136,36 @@ export default function LaporanScreen() {
                 {/* Ringkasan */}
                 <View style={styles.summaryRow}>
                     <View style={styles.summaryCard}>
-                        <Text style={styles.summaryLabel}>Saldo</Text>
+                        <Text style={styles.summaryLabel}>SALDO BERSIH</Text>
                         <Text style={styles.summaryValue}>Rp {(data?.saldo ?? 0).toLocaleString('id-ID')}</Text>
                     </View>
                 </View>
 
                 <View style={styles.summaryRow}>
                     <View style={[styles.summaryCardHalf, { backgroundColor: colors.success + '20' }]}>
-                        <Text style={styles.summaryLabelSmall}>Uang Masuk</Text>
+                        <Text style={styles.summaryLabelSmallMasuk}>● UANG MASUK</Text>
                         <Text style={[styles.summaryValueSmall, { color: colors.success }]}>
-                            Rp {(data?.uangMasuk ?? 0).toLocaleString('id-ID')}
+                            +Rp {(data?.uangMasuk ?? 0).toLocaleString('id-ID')}
                         </Text>
+                        <Text>{transaksiMasuk} transaksi masuk</Text>
                     </View>
 
                     <View style={[styles.summaryCardHalf, { backgroundColor: colors.error + '20' }]}>
-                        <Text style={styles.summaryLabelSmall}>Uang Keluar</Text>
+                        <Text style={styles.summaryLabelSmallKeluar}>● UANG KELUAR</Text>
                         <Text style={[styles.summaryValueSmall, { color: colors.error }]}>
-                            Rp {(data?.uangKeluar ?? 0).toLocaleString('id-ID')}
+                            -Rp {(data?.uangKeluar ?? 0).toLocaleString('id-ID')}
                         </Text>
+                        <Text>{transaksiKeluar} pengeluaran</Text>
                     </View>
                 </View>
 
                 {/* Riwayat */}
-                <Text style={styles.sectionTitle}>Riwayat Transaksi</Text>
+                <View style={styles.sectionRiwayatRow}>
+                    <Text style={styles.sectionTitle}>Riwayat Transaksi</Text>
+                    <Text style={styles.riwayatsection}>
+                        {mode === 'harian' ? 'Hari ini' : 'Bulan ini'} ● {data?.riwayat.length} Transaksi
+                    </Text>
+                </View>
 
                 {isLoading && <Text style={styles.emptyText}>Memuat data...</Text>}
 
@@ -158,7 +181,7 @@ export default function LaporanScreen() {
                         </View>
 
                         <View style={styles.riwayatKanan}>
-                            <Text style={styles.riwayatTanggal}>{formatDate(item.timestamp)}</Text>
+                            <Text style={styles.riwayatTanggal}>{formatDate(item.timestamp)} WIB</Text>
                             <Text style={[
                                 styles.riwayatJumlah,
                                 { color: item.tipe === 'Masuk' ? colors.success : colors.error }
@@ -258,14 +281,19 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: '500',
         color: colors.primary,
-        marginBottom: 16,
         textAlign: 'center'
+    },
+    subTitle: {
+        color: colors.textDark,
+        textAlign: 'center',
+        fontSize: 14,
+        marginBottom: 16,
     },
     toggleContainer: {
         flexDirection: 'row',
-        borderRadius: layout.cardRadius,
+        borderRadius: 38,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#cccc',
@@ -275,7 +303,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 12,
         alignItems: 'center',
-        backgroundColor: colors.surface,
+       ...layout.cardBorder
     },
     toggleButtonActive: {
         backgroundColor: colors.primary,
@@ -288,7 +316,7 @@ const styles = StyleSheet.create({
         color: colors.surface,
     },
     dateNav: {
-        backgroundColor: '#e2faff',
+        backgroundColor: colors.pink,
         borderRadius: layout.cardRadius,
         padding: 16,
         flexDirection: 'row',
@@ -303,6 +331,11 @@ const styles = StyleSheet.create({
         color: colors.primary,
         paddingHorizontal: 12,
         
+    },
+    dateNavTextRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8
     },
     dateNavText: {
         color: colors.textDark,
@@ -322,11 +355,10 @@ const styles = StyleSheet.create({
     },
     summaryLabel: {
         color: colors.textDark,
-        opacity: 0.6,
         marginBottom: 4,
     },
     summaryValue: {
-        fontSize: 28,
+        fontSize: 36,
         fontWeight: 'bold',
         color: colors.primary,
     },
@@ -335,15 +367,28 @@ const styles = StyleSheet.create({
         borderRadius: layout.cardRadius,
         padding: 16,
     },
-    summaryLabelSmall: {
-        color: colors.textDark,
-        opacity: 0.7,
+    summaryLabelSmallMasuk: {
+        color: '#006C49',
         marginBottom: 4,
         fontSize: 13,
+        fontWeight: '500'
+    },
+    summaryLabelSmallKeluar: {
+        color: colors.primary,
+        marginBottom: 4,
+        fontSize: 13,
+        fontWeight: '500'
     },
     summaryValueSmall: {
         fontSize: 18,
         fontWeight: 'bold',
+        marginBottom: 4
+    },
+    sectionRiwayatRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 14,
     },
     sectionTitle: {
         fontSize: 18,
@@ -351,6 +396,14 @@ const styles = StyleSheet.create({
         color: colors.textDark,
         marginTop: 8,
         marginBottom: 12,
+    },
+    riwayatsection: {
+        borderRadius: layout.cardRadius,
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        backgroundColor: '#E2E7FF',
+        ...layout.cardBorder,
+        ...layout.cardShadowLight,
     },
     emptyText: {
         textAlign: 'center',

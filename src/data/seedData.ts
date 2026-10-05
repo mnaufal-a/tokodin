@@ -1,6 +1,7 @@
 import type { RiwayatItem } from "../api/kasHistoryApi";
 import type { Order } from "../api/ordersApi";
 import type { ChatLog } from "../api/chatHistoryApi";
+import { relativeJakartaTimestamp } from "../utils/jakartaDate";
 
 export const seedKasTransaksi: RiwayatItem[] = [
     {
@@ -43,7 +44,7 @@ export const seedKasTransaksi: RiwayatItem[] = [
 export const seedOrders: Order[] = [
     {
         id: 'demo-order-1',
-        createdAt: '2026-09-17T07:00:00.000Z',
+        createdAt: relativeJakartaTimestamp(3, 7, 0),
         customerName: 'budi',
         phoneNumber: '6281234500007',
         orderText: 'Nasi Uduk x 10, Gorengan Tempe x 5, Gorengan Tahu x 5',
@@ -53,7 +54,7 @@ export const seedOrders: Order[] = [
     },
     {
         id: 'demo-order-2',
-        createdAt: '2026-09-17T07:30:00.000Z',
+        createdAt: relativeJakartaTimestamp(3, 7, 0),
         customerName: 'bu Ret',
         phoneNumber: '6281234500009',
         orderText: 'Nasi Uduk x 20, Lontong Sayur x 20, Gorengan Tahu x 10, Gorengan Tempe x 10',
@@ -63,7 +64,7 @@ export const seedOrders: Order[] = [
     },
     {
         id: 'demo-order-3',
-        createdAt: '2026-09-18T08:00:00.000Z',
+        createdAt: relativeJakartaTimestamp(2, 7, 0),
         customerName: 'owo',
         phoneNumber: '6281234500002',
         orderText: 'Nasi Uduk x 5',
@@ -73,7 +74,7 @@ export const seedOrders: Order[] = [
     },
     {
         id: 'demo-order-4',
-        createdAt: '2026-09-18T08:10:00.000Z',
+        createdAt: relativeJakartaTimestamp(0, 7, 0),
         customerName: 'bu nis',
         phoneNumber: '6281234500001',
         orderText: 'Nasi Uduk x 10, Gorengan Pisang x 5, Gorengan Tahu x 5',
@@ -83,7 +84,7 @@ export const seedOrders: Order[] = [
     },
     {
         id: 'demo-order-5',
-        createdAt: '2026-09-19T09:00:00.000Z',
+        createdAt: relativeJakartaTimestamp(0, 7, 0),
         customerName: 'ilham',
         phoneNumber: '6281234500010',
         orderText: 'Nasi Uduk x 2',

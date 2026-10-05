@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import { addKasEntry, KasEntryInput } from "../api/kasApi";
 import { colors } from "../theme/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { layout } from "../theme/layout";
 
 const KATEGORI_LIST = ['Modal', 'Belanja Bahan Baku', 'Operasional', 'Lain-lain'];
 
@@ -99,33 +100,36 @@ function KasEntryScreen({ navigation, route }: Props) {
                     </TouchableOpacity>
                 ))}
             </View>
+            
+            <View style={styles.card}>
 
-            <Text style={styles.label}>Nominal (Rp)</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Contoh: 50.000"
-                keyboardType="numeric"
-                value={formatRupiah(jumlah)}
-                onChangeText={handleJumlahChange}
-            />
+                <Text style={styles.label}>Nominal (Rp)</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Contoh: 50.000"
+                    keyboardType="numeric"
+                    value={formatRupiah(jumlah)}
+                    onChangeText={handleJumlahChange}
+                />
 
-            <Text style={styles.label}>Keterangan</Text>
-            <TextInput 
-                style={styles.input}
-                placeholder="Contoh: Beli Gas 1 tabung"
-                value={keterangan}
-                onChangeText={setKeterangan}
-            />
+                <Text style={styles.label}>Keterangan</Text>
+                <TextInput 
+                    style={styles.input}
+                    placeholder="Contoh: Beli Gas 1 tabung"
+                    value={keterangan}
+                    onChangeText={setKeterangan}
+                />
 
-            <TouchableOpacity 
-                style={[styles.submitButton, submitting && styles.submitDisabled]}
-                onPress={handleSubmit}
-                disabled={submitting}
-            >
-                <Text style={styles.submitText}>
-                    {submitting ? 'Menyimpan...' : `Simpan ${tipe}`}
-                </Text>
-            </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.submitButton, submitting && styles.submitDisabled]}
+                    onPress={handleSubmit}
+                    disabled={submitting}
+                >
+                    <Text style={styles.submitText}>
+                        {submitting ? 'Menyimpan...' : `Simpan ${tipe}`}
+                    </Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     )
 }
@@ -136,8 +140,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: 16,
   },
+  card: {
+        backgroundColor: colors.surface,
+        borderRadius: layout.cardRadius,
+        padding: 16,
+        marginBottom: 24,
+        marginTop: 16,
+        ...layout.cardBorder,
+        ...layout.cardShadowLight
+  },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: colors.textDark,
     marginTop: 16,
@@ -155,14 +168,16 @@ const styles = StyleSheet.create({
   toggleButton: {
     flex: 1,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: layout.cardRadius,
+    alignItems: 'center',
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.textDark,
-    alignItems: 'center',
+    ...layout.cardShadowLight
   },
   toggleActiveMasuk: {
     backgroundColor: colors.success,
-    borderColor: colors.success,
+    borderColor: colors.success,        
   },
   toggleActiveKeluar: {
     backgroundColor: '#DC2626',
@@ -179,31 +194,34 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 20,
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.textDark,
+    borderColor: colors.primary,
+    ...layout.cardShadowLight
   },
   kategoriActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
   kategoriText: {
-    color: colors.textDark,
+    color: colors.primary,
     fontSize: 13,
   },
   kategoriTextActive: {
     color: colors.surface,
   },
   input: {
-    borderWidth: 1,
-    borderColor: colors.textDark,
-    borderRadius: 8,
+    borderRadius: layout.cardRadius,
     padding: 12,
     fontSize: 16,
-    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    backgroundColor: colors.background,
+    ...layout.cardShadowLight
   },
   submitButton: {
     backgroundColor: colors.primary,
-    borderRadius: 8,
+    borderRadius: layout.cardRadius,
     padding: 16,
     alignItems: 'center',
     marginTop: 24,

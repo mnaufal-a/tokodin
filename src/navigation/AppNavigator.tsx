@@ -8,12 +8,21 @@ import LaporanScreen from '../screens/LaporanScreen';
 import AccountScreen from '../screens/AccountScreen';
 import { Home, MessageCircle, Inbox, BarChart3, User } from 'lucide-react-native';
 import { colors } from '../theme/colors';
-import { Text } from 'react-native';
 import { useOverdue } from '../context/OverdueContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Image } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const DashboardStack = createNativeStackNavigator();
+
+function HeaderLogo() {
+  return (
+    <Image
+      source={require('../assets/logo.png')}
+      style={{ width: 32, height: 32, marginRight: 14, borderRadius: 8 }}
+    />
+  );
+}
 
 function DashboardTabIcon({ color, size }: { color: string; size: number }) {
   return <Home color={color} size={size}/>
@@ -48,7 +57,7 @@ function DashboardStackNavigator() {
       <DashboardStack.Screen
         name='DashboardMain'
         component={DashboardScreen}
-        options={{ title: 'Statistik Harian'}}
+        options={{ title: 'Statistik Harian', headerRight: HeaderLogo}}
       />
 
       <DashboardStack.Screen
@@ -85,15 +94,16 @@ function AppNavigator() {
             fontSize: 12,
             fontWeight: 'bold'
           },
+          headerRight: HeaderLogo
         }}
       >
 
         <Tab.Screen
-          name="ChatHistory"
+          name="Riwayat"
           component={ChatHistoryScreen}
           options={{
             headerShown: true,
-            title: 'Riwayat Chat',
+            title: 'Riwayat',
             tabBarIcon: ChatHistoryTabIcon,
           }}
         />
