@@ -18,7 +18,7 @@ TokoDin berawal dari warung nasi uduk milik keluarga saya, yang tadinya mencatat
 - Halaman Akun
 
 **Hanya di versi asli (dengan backend n8n)**
-- Pencatatan pesanan otomatis dari WhatsApp
+- Pencatatan pesanan otomatis dari WhatsApp dan Email
 - Asisten pemesanan berbasis AI (Google Gemini) dengan memori sesi
 - Sinkronisasi data ke Google Sheets
 - Riwayat chat dari percakapan sungguhan
