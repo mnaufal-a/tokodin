@@ -29,7 +29,9 @@ TokoDin berawal dari warung nasi uduk milik keluarga saya, yang tadinya mencatat
   <img src="screenshots/01-dashboard.png" width="200" alt="Dashboard">
   <img src="screenshots/02-laporanh.png" width="200" alt="Pencatatan kas">
   <img src="screenshots/03-laporan.png" width="200" alt="Laporan">
-  <img src="screenshots/04-akun.png" width="200" alt="Akun">
+  <img src="screenshots/04-pesan.png" width="200" alt=Pesan">
+  <img src="screenshots/05-riwayat_ai.png" width="200" alt=Riwayat">
+  <img src="screenshots/06-akun.png" width="200" alt="Akun">
 </p>
 
 *Screenshot dari versi demo.*
