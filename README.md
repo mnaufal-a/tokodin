@@ -1,97 +1,79 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# TokoDin
 
-# Getting Started
+Aplikasi kasir dan manajemen kas sederhana untuk warung dan UMKM Indonesia, dibangun dengan React Native dan otomasi n8n.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+[![Google Play](https://img.shields.io/badge/Google_Play-Tersedia-red)](https://play.google.com/store/apps/details?id=com.umkmcommandcenter)
 
-## Step 1: Start Metro
+## Latar belakang
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+TokoDin berawal dari warung nasi uduk milik keluarga saya, yang tadinya mencatat kas dan pesanan secara manual. Untuk memudahkannya, saya membuat aplikasi yang bisa mencatat kas masuk dan keluar, menampilkan laporan keuangan harian dan bulanan, serta (di versi asli) menangkap pesanan dari WhatsApp secara otomatis dengan bantuan n8n.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Fitur
 
-```sh
-# Using npm
-npm start
+**Versi Google Play (demo lokal)**
+- Dashboard statistik harian
+- Pencatatan kas masuk dan kas keluar
+- Laporan keuangan harian dan bulanan
+- Daftar pesanan dan riwayat chat (berisi data contoh)
+- Halaman Akun
 
-# OR using Yarn
-yarn start
-```
+**Hanya di versi asli (dengan backend n8n)**
+- Pencatatan pesanan otomatis dari WhatsApp
+- Asisten pemesanan berbasis AI (Google Gemini) dengan memori sesi
+- Sinkronisasi data ke Google Sheets
+- Riwayat chat dari percakapan sungguhan
 
-## Step 2: Build and run your app
+## Screenshot
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+<p align="center">
+  <img src="screenshots/01-dashboard.png" width="200" alt="Dashboard">
+  <img src="screenshots/02-kas.png" width="200" alt="Pencatatan kas">
+  <img src="screenshots/03-laporan.png" width="200" alt="Laporan">
+  <img src="screenshots/04-akun.png" width="200" alt="Akun">
+</p>
 
-### Android
+*Screenshot dari versi demo.*
 
-```sh
-# Using npm
-npm run android
+## Tech stack
 
-# OR using Yarn
-yarn android
-```
+- React Native 0.86 (New Architecture) + TypeScript
+- React Navigation, React Native Paper, react-native-gifted-charts, lucide-react-native
+- AsyncStorage untuk penyimpanan lokal (versi demo)
+- n8n (workflow automation), di-host di Railway
+- Google Sheets sebagai database bisnis dan Google Gemini sebagai AI agent (versi asli)
 
-### iOS
+## Dua mode aplikasi
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+| | Versi demo (Google Play) | Versi asli |
+|---|---|---|
+| Data | Lokal di perangkat | Google Sheets via n8n |
+| Backend | Tidak ada | n8n di Railway |
+| Akun/login | Tidak ada | Tidak ada |
+| Pengguna | Publik | Dipakai untuk usaha keluarga |
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Mode diatur lewat `IS_DEMO_BUILD` di `src/config.ts`.
 
-```sh
-bundle install
-```
+## Status
 
-Then, and every time you update your native dependencies, run:
+Versi 1.0 tersedia di [Google Play](https://play.google.com/store/apps/details?id=com.umkmcommandcenter) dan berjalan dalam mode demo lokal.
 
-```sh
-bundle exec pod install
-```
+Rencana ke depan: tampilan awal tanpa data contoh, dan sistem akun sebagai proyek terpisah.
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Cara menjalankan
 
-```sh
-# Using npm
-npm run ios
+**Prasyarat:** Node.js 22.11.0 atau lebih baru, serta lingkungan React Native CLI untuk Android (JDK, Android Studio + SDK, dan emulator atau HP dengan USB debugging). Ikuti panduan "Set Up Your Environment" di reactnative.dev, pilih Android.
 
-# OR using Yarn
-yarn ios
-```
+1. Clone dan pasang dependensi:
+   ```bash
+   git clone https://github.com/mnaufal-a/tokodin.git
+   cd tokodin
+   npm install
+   ```
+2. Salin file konfigurasi: `src/config/secret.example.ts` menjadi `src/config/secret.ts`. Nilainya boleh dibiarkan seperti contoh, karena mode demo tidak memanggil backend.
+3. Jalankan `npm start`, lalu di terminal lain `npm run android`.
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Mode demo (`IS_DEMO_BUILD = true`) berjalan penuh secara lokal. Mode asli membutuhkan instance n8n dan Google Sheets milik sendiri, yang tidak disertakan di repo ini. Kalau muncul error `Unable to resolve module ../config/secret`, berarti langkah 2 terlewat.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Kebijakan privasi
 
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+https://mnaufal-a.github.io/tokodin/privacy-policy.html
